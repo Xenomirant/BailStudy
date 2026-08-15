@@ -76,7 +76,7 @@ def test_unit_cv_weighting_and_estimate():
     p8 = (1 - q) / 9
     out = proc(torch.zeros((1, 1), dtype=torch.long), scores.clone())
     expect_q = q * 0.9 + p8 * 0.5
-    expect_s = q + p8
+    expect_s = q  # s is mask-tier-only (token 7); watch token 8 excluded
     assert abs(proc.log_surv_q[0].item() - math.log1p(-expect_q)) < 1e-4
     assert abs(proc.log_surv_s[0].item() - math.log1p(-expect_s)) < 1e-4
     assert torch.isinf(out[0, 7]) and not torch.isinf(out[0, 8])  # watch tier unmasked

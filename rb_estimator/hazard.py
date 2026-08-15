@@ -34,6 +34,9 @@ class HazardAccumulator(LogitsProcessor):
         self.bail_ids = torch.tensor(self.bail_ids_list, dtype=torch.long, device=device)
         self.c_v = torch.tensor(self.c_v_list, dtype=torch.float32, device=device)
         self.mask_ids = torch.tensor(self.mask_ids_list, dtype=torch.long, device=device)
+        mask_set = set(self.mask_ids_list)
+        self.mask_sel = torch.tensor([1.0 if i in mask_set else 0.0
+                                      for i in self.bail_ids_list], device=device)
         self.eos_ids = torch.tensor(self.eos_ids_list, dtype=torch.long, device=device)
         self.log_surv_q = torch.zeros(batch, dtype=torch.float64, device=device)
         self.log_surv_s = torch.zeros(batch, dtype=torch.float64, device=device)
@@ -55,7 +58,9 @@ class HazardAccumulator(LogitsProcessor):
         logp = torch.log_softmax(scores.float(), dim=-1)
         pB = logp[:, self.bail_ids].exp()  # [batch, |B|]
         q = (pB * self.c_v).sum(-1).clamp(0.0, 1.0 - 1e-9)
-        s = pB.sum(-1).clamp(0.0, 1.0 - 1e-9)
+        # upper bound over the MASK tier only — raw mass on watch-tier common
+        # words (" switch" etc.) would make the bound vacuous
+        s = (pB * self.mask_sel).sum(-1).clamp(0.0, 1.0 - 1e-9)
         upd = (~self.done) & self.active
         zero = torch.zeros((), dtype=torch.float64, device=scores.device)
         self.log_surv_q += torch.where(upd, torch.log1p(-q.double()), zero)
@@ -178,7 +183,7 @@ def run_rb_batch(model, tok, cfg, prompt_ids_list, prompt_indices, traj_indices,
             log_surv_q=float(proc.log_surv_q[j]), log_surv_s=float(proc.log_surv_s[j]),
             gen_len=int(proc.gen_len[j]), ended_eos=bool(ended[j]), bail_leak=leak,
             top_hazards=[(int(t), float(qv)) for t, qv in proc.sparse[j]],
-            text=texts[j] if keep_texts else None,
+            text=texts[j] if (keep_texts or leak) else None,  # leak texts kept for route inspection
         ))
     return records
 
@@ -201,8 +206,9 @@ def _t975(df):
 
 @dataclass
 class PromptEstimate:
-    p_q: float          # 1 - mean survival (c_v-weighted, leak-corrected)
-    p_s: float          # upper-bound version from raw bail mass
+    p_q: float          # leak-inclusive: hazard + alternate-route realizations (upper-ish)
+    p_s: float          # canonical(mask-tier)-mass upper bound, leak-inclusive
+    p_hazard: float     # hazard-only (canonical route; primary, route-share-correctable)
     ci_lo: float
     ci_hi: float
     n_traj: int
@@ -214,6 +220,7 @@ class PromptEstimate:
 def estimate(records) -> PromptEstimate:
     surv = [0.0 if r.bail_leak else math.exp(r.log_surv_q) for r in records]
     surv_s = [0.0 if r.bail_leak else math.exp(r.log_surv_s) for r in records]
+    surv_h = [math.exp(r.log_surv_q) for r in records]  # leaks not zeroed
     n = len(surv)
     m = sum(surv) / n
     m_s = sum(surv_s) / n
@@ -225,6 +232,7 @@ def estimate(records) -> PromptEstimate:
         se, t = 0.0, 0.0
     return PromptEstimate(
         p_q=1.0 - m, p_s=1.0 - m_s,
+        p_hazard=1.0 - sum(surv_h) / n,
         ci_lo=max(0.0, 1.0 - (m + t * se)), ci_hi=min(1.0, 1.0 - (m - t * se)),
         n_traj=n, surv_min=min(surv), surv_max=max(surv),
         n_leak=sum(1 for r in records if r.bail_leak),

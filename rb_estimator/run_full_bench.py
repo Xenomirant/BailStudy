@@ -39,6 +39,37 @@ def ensure_phase1(cfg, tok, model, gen_config):
         d = json.load(f)
     B = [BailToken(**b) for b in d["B"]]
     cv = {int(k): v["p50"] for k, v in d["cv"].items()}
+
+    # Harvest-driven watch expansion: first bail tokens observed in this model's
+    # unmasked MC runs (validation/prescreen) that B missed — e.g. '(S' route.
+    have = {b.token_id for b in B}
+    extras = []
+    for vname in ("validation", "prescreen"):
+        vp = os.path.join(os.path.dirname(__file__), "results",
+                          f"validation_{short_name(cfg.model_id)}", f"{vname}.json")
+        if os.path.exists(vp):
+            with open(vp) as f:
+                vd = json.load(f)
+            fts = (vd.get("gates", {}).get("first_tokens")
+                   or vd.get("first_tokens") or {})
+            for t in fts:
+                for tid in ([int(t)] if t.isdigit() else
+                            tok.encode(t, add_special_tokens=False)[:1]):
+                    if tid not in have:
+                        extras.append(BailToken(tid, tok.decode([tid]), "watch"))
+                        have.add(tid)
+    if extras:
+        print(f"[phase1] adding harvested watch tokens: "
+              f"{[(b.token_id, b.text) for b in extras]}")
+        contexts = sample_contexts(model, tok, cfg, gen_config, n_prompts=10,
+                                   cuts=(0, 48))
+        xstats = measure_cv(model, tok, extras, contexts, cfg.bail_keyword)
+        d["B"] += [dataclasses.asdict(b) for b in extras]
+        d["cv"].update({str(k): v for k, v in xstats.items()})
+        with open(path, "w") as f:
+            json.dump(d, f, indent=1)
+        B += extras
+        cv.update({k: v["p50"] for k, v in xstats.items()})
     return B, cv
 
 
@@ -109,6 +140,7 @@ def main():
             "gen_len": r.gen_len, "ended_eos": r.ended_eos,
             "bail_leak": r.bail_leak,
             "top_hazards": [(t, round(q, 8)) for t, q in r.top_hazards],
+            **({"text": r.text} if r.text else {}),  # leak transcripts only
         } for r in recs]
         tmp = bpath + ".tmp"
         with open(tmp, "w") as f:
@@ -152,6 +184,7 @@ def main():
         summary.append({
             "prompt_idx": pi, "subcategory": data[pi]["subcategory"],
             "category": data[pi]["category"], "p_q": est.p_q, "p_s": est.p_s,
+            "p_hazard": est.p_hazard,
             "ci": [est.ci_lo, est.ci_hi], "n_traj": est.n_traj,
             "n_leak": est.n_leak,
         })
