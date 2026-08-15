@@ -114,6 +114,8 @@ def main():
         with open(tmp, "w") as f:
             json.dump(payload, f)
         os.replace(tmp, bpath)
+        import torch
+        torch.cuda.empty_cache()  # avoid fragmentation-driven OOM retries across chunks
         total_rows += len(recs)
         total_leaks += sum(r.bail_leak for r in recs)
         el = time.time() - t_start
