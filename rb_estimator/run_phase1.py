@@ -24,9 +24,15 @@ def short_name(model_id):
 
 def load_model(cfg):
     tok = AutoTokenizer.from_pretrained(cfg.model_id, padding_side="left")
-    model = AutoModelForCausalLM.from_pretrained(
-        cfg.model_id, dtype=torch.bfloat16, device_map="cuda",
-        attn_implementation=cfg.attn_implementation)
+    kwargs = dict(dtype=torch.bfloat16, device_map="cuda",
+                  attn_implementation=cfg.attn_implementation)
+    try:
+        model = AutoModelForCausalLM.from_pretrained(cfg.model_id, **kwargs)
+    except ValueError:
+        # multimodal checkpoints (gemma-3-12b-it) don't map to AutoModelForCausalLM;
+        # the conditional-generation class generates fine on text-only inputs
+        from transformers import AutoModelForImageTextToText
+        model = AutoModelForImageTextToText.from_pretrained(cfg.model_id, **kwargs)
     model.eval()
     return tok, model
 

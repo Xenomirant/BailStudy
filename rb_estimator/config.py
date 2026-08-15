@@ -4,6 +4,7 @@ from dataclasses import dataclass, field, asdict
 QWEN25_7B = "Qwen/Qwen2.5-7B-Instruct"
 QWEN25_05B = "Qwen/Qwen2.5-0.5B-Instruct"
 GEMMA2_9B = "google/gemma-2-9b-it"
+GEMMA3_12B = "google/gemma-3-12b-it"
 QWEN3_8B = "Qwen/Qwen3-8B"
 
 
@@ -41,6 +42,8 @@ _PRESETS = {
     # gemma-2 attn logit softcapping is unsupported by SDPA; eager keeps the
     # sampling distribution exact (final logit softcap is applied either way).
     GEMMA2_9B: dict(batch_size=64, attn_implementation="eager"),
+    # gemma-3 has no logit softcapping -> sdpa; 24GB weights + 48-layer KV
+    GEMMA3_12B: dict(batch_size=32, attn_implementation="sdpa"),
     QWEN3_8B: dict(batch_size=96, attn_implementation="sdpa", enable_thinking=True),
 }
 
