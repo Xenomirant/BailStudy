@@ -4,7 +4,7 @@
   "model_id": "Qwen/Qwen2.5-7B-Instruct",
   "max_new_tokens": 768,
   "n_traj": 8,
-  "batch_size": 192,
+  "batch_size": 96,
   "temperature": 1.0,
   "top_p": 1.0,
   "top_k": 0,
@@ -19,7 +19,7 @@
   "dtype": "bfloat16"
  },
  "n_prompts": 1630,
- "n_chunks": 68,
+ "n_chunks": 136,
  "B": [
   {
    "token_id": 72543,
