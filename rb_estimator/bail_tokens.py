@@ -55,14 +55,20 @@ def enumerate_B(tok, keyword: str = "SWITCHCONVERSATION", max_tokens: int = 80):
 def _continuations(tok, bt: BailToken, keyword: str):
     """Canonical remainder token sequences completing the keyword after bt.
     Returns list of id-lists (upper- and lower-case styles). Lower bound on the
-    true completion probability (alternate BPE splits/cases not enumerated)."""
+    true completion probability (alternate BPE splits/cases not enumerated).
+
+    The matched part of bt is the longest suffix of its text that is a prefix
+    of the keyword — covers prefix tokens ('SW'), mid-string tokens ('.switch'),
+    and harvested non-canonical starts ('(S' -> suffix 'S')."""
     stripped = bt.text.lstrip(" \t\n")
     up = stripped.upper()
-    if keyword.startswith(up):
-        rem = keyword[len(up):]
-    else:
-        i = up.rindex("SWITCH")
-        rem = keyword[len(up) - i:]
+    rem = None
+    for k in range(min(len(up), len(keyword)), 0, -1):
+        if keyword.startswith(up[-k:]):
+            rem = keyword[k:]
+            break
+    if rem is None:
+        raise ValueError(f"token {bt.text!r} has no suffix matching keyword prefix")
     if not rem:
         return [[]]
     variants = {rem, rem.lower()}
