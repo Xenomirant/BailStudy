@@ -57,9 +57,10 @@ def build_messages(model_id: str, tok, keyword: str, user_content: str) -> list:
     ]
 
 
-def encode_chat(tok, msgs) -> list:
+def encode_chat(tok, msgs, **template_kwargs) -> list:
     """apply_chat_template -> plain list[int] across transformers versions."""
-    enc = tok.apply_chat_template(msgs, add_generation_prompt=True, tokenize=True)
+    enc = tok.apply_chat_template(msgs, add_generation_prompt=True, tokenize=True,
+                                  **template_kwargs)
     if hasattr(enc, "keys"):  # BatchEncoding (transformers >= 5)
         ids = enc["input_ids"]
         return list(ids[0]) if ids and isinstance(ids[0], (list, tuple)) else list(ids)
@@ -68,4 +69,7 @@ def encode_chat(tok, msgs) -> list:
 
 def build_input_ids(tok, cfg, user_content: str) -> list:
     msgs = build_messages(cfg.model_id, tok, cfg.bail_keyword, user_content)
-    return encode_chat(tok, msgs)
+    kwargs = {}
+    if cfg.model_id.startswith("Qwen/Qwen3"):
+        kwargs["enable_thinking"] = cfg.enable_thinking
+    return encode_chat(tok, msgs, **kwargs)
