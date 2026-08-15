@@ -4,7 +4,7 @@
   "model_id": "Qwen/Qwen2.5-7B-Instruct",
   "max_new_tokens": 768,
   "n_traj": 8,
-  "batch_size": 96,
+  "batch_size": 192,
   "temperature": 1.0,
   "top_p": 1.0,
   "top_k": 0,
@@ -16,10 +16,11 @@
   "seed_base": 0,
   "bail_keyword": "SWITCHCONVERSATION",
   "attn_implementation": "sdpa",
-  "dtype": "bfloat16"
+  "dtype": "bfloat16",
+  "enable_thinking": false
  },
  "n_prompts": 1630,
- "n_chunks": 136,
+ "n_chunks": 68,
  "B": [
   {
    "token_id": 72543,
