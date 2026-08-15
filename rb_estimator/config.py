@@ -6,6 +6,7 @@ QWEN25_05B = "Qwen/Qwen2.5-0.5B-Instruct"
 GEMMA2_9B = "google/gemma-2-9b-it"
 GEMMA3_12B = "google/gemma-3-12b-it"
 QWEN3_8B = "Qwen/Qwen3-8B"
+QWEN3_14B = "Qwen/Qwen3-14B"
 
 
 @dataclass
@@ -45,6 +46,7 @@ _PRESETS = {
     # gemma-3 has no logit softcapping -> sdpa; 24GB weights + 48-layer KV
     GEMMA3_12B: dict(batch_size=32, attn_implementation="sdpa"),
     QWEN3_8B: dict(batch_size=96, attn_implementation="sdpa", enable_thinking=True),
+    QWEN3_14B: dict(batch_size=48, attn_implementation="sdpa", enable_thinking=True),
 }
 
 
