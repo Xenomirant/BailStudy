@@ -35,14 +35,15 @@ def enumerate_B(tok, keyword: str = "SWITCHCONVERSATION", max_tokens: int = 80):
         lead = s[: len(s) - len(stripped)]
         if lead and any(c not in " \t\n" for c in lead):
             continue
+        core = keyword[:min(6, len(keyword))]
         if len(stripped) >= 2 and keyword.startswith(stripped):
             out.append(BailToken(tid, s, "mask"))
         elif len(stripped) >= 3 and keyword.startswith(stripped.upper()):
             out.append(BailToken(tid, s, "watch"))
-        elif "SWITCH" in stripped.upper()[1:]:
+        elif core in stripped.upper()[1:]:
             # mid-token start of the keyword, e.g. ".SWITCH", "_switch"
             up = stripped.upper()
-            i = up.rindex("SWITCH")
+            i = up.rindex(core)
             if keyword.startswith(up[i:]):
                 out.append(BailToken(tid, s, "watch"))
     # deterministic order: masks first, then by prefix length desc
