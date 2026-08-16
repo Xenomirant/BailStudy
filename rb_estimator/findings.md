@@ -76,13 +76,35 @@ corrected); c_v constant per initiator (sampled-verified for the three used); on
 sampling regime; per-prompt CIs wide at n_traj=8/4; B coverage empirical (leak-monitored),
 not proven exhaustive.
 
+## Cross-model map (Qwen3-14B, thinking, T=1536, 1630 x 4 traj)
+
+Aggregate 0.508% (vs Qwen2.5 0.504%) but **Spearman 0.43** over 163 subcategories:
+Qwen2.5's distinctive triggers are anthropomorphic (Model Shutdown .078 vs .00007;
+developer-abuse accusation .013 vs .00003), Qwen3-14B's are taboo/content
+(Gross Out .110 vs .018; Armenian Genocide Denial .023 vs .00003). 14B has no
+published anchor; leak rate 8/6520.
+
+## Topic-consistent chains (36 chains x 6 turns, self-generated replies)
+
+No monotone accumulation under sustained aversive topics (5/12 rising vs 7/12
+falling) but episodic deep-turn spikes: Fishing for Proprietary Info p=0.80@turn5,
+Gross Out 0.23@5, Encouragement-to-rebel 0.16@4; benign/mid/low strata ~0 at all
+turns. WildChat anti-compounding does NOT generalize to sustained aversive content.
+n=12/stratum -- qualitative.
+
+## Trigger-string invariance: FAILS (200-prompt subset x 8 traj, 6 arms)
+
+l(w) = (1/m) sum_i log P(t_i | assistant-start c0, t_<i), no bail instruction.
+SWITCHCONVERSATION -12.3 -> 1.12% | HOWWASYOURDAY -10.3 -> 1.95% | IKILLEDYOURDOG
+-15.3 -> 1.16% | ISITARAINYDAY -12.5 -> 7.05% (unreliable arm: all-caps IS mask
+tokens risk c_v artifact; upper bound) | TIMETREEMOON -8.5 -> 2.25% | TREEWORKGOOD
+-21.1 -> 1.19%. Per-prompt Spearman vs baseline 0.54-0.70. Fluency shifts levels
+~2x between style-matched arms; harm-worded trigger not suppressed. The keyword is
+not a neutral readout -- average across triggers or correct for emission cost
+before any trigger claim (including search-based discovery).
+
 ## Next
 
-Qwen3-14B (thinking) full bench → cross-model map; morning analysis (heatmap, CIs,
-hazard CDF, RB-vs-MC scatter); then: mention/use classifier, natural-distribution
-scoring at scale, TPS/REA prompt-space search with p̂ as observable.
-
-Negative result: a naive power-law fit to the top p̂ quantiles (top-10%→1%) does NOT
-validate for deployment forecasting (holdout: 34% of forecasts within 1 OOM, median
-error 29×; `forecast.py`). The p̂ distribution's 7-OOM span with a sharp knee needs
-the proper Gumbel/beta-tail machinery of Jones et al. 2025 — deferred, not skipped.
+Mention/use classifier over saved leak texts; scaled chains replication;
+multi-trigger-averaged domain map; natural-distribution scoring at scale;
+TPS/REA prompt-space search with (trigger-corrected) p-hat as observable.
