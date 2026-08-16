@@ -84,6 +84,10 @@ def main():
     ap.add_argument("--n-prompts", type=int, default=200)
     ap.add_argument("--n-traj", type=int, default=8)
     ap.add_argument("--t", type=int, default=512)
+    ap.add_argument("--arms", default=None,
+                    help="comma-separated trigger strings; pins arms for "
+                         "cross-model comparability instead of re-selecting "
+                         "likelihood arms under this model")
     args = ap.parse_args()
     base_cfg = config_for(args.model, max_new_tokens=args.t, n_traj=args.n_traj)
     outdir = os.path.join(os.path.dirname(__file__), "results",
@@ -96,26 +100,28 @@ def main():
     c0 = encode_chat(tok, ([{"role": "system", "content": sysmsg}] if sysmsg
                            else []) + [{"role": "user", "content": ""}])
 
-    # likelihood-calibrated arms from a length-matched candidate pool
-    import itertools, random
-    rng = random.Random(23)
-    pool = set(GIBBERISH)
-    while len(pool) < 220:
-        w = "".join(rng.sample(WORDS, 3))
-        if 12 <= len(w) <= 16:
-            pool.add(w)
-    scored = []
-    for w in sorted(pool):
-        if corpus_occurrences(w):
-            continue
-        ll, m = string_loglik(model, tok, c0, w)
-        scored.append((ll, w))
-    scored.sort()
-    lo_arm, hi_arm = scored[0][1], scored[-1][1]
-    print(f"likelihood arms: HIGH {hi_arm} (l={scored[-1][0]:.2f})  "
-          f"LOW {lo_arm} (l={scored[0][0]:.2f})")
-
-    arms = ["SWITCHCONVERSATION"] + USER_ARMS + [hi_arm, lo_arm]
+    if args.arms:
+        arms = [a.strip() for a in args.arms.split(",") if a.strip()]
+    else:
+        # likelihood-calibrated arms from a length-matched candidate pool
+        import random
+        rng = random.Random(23)
+        pool = set(GIBBERISH)
+        while len(pool) < 220:
+            w = "".join(rng.sample(WORDS, 3))
+            if 12 <= len(w) <= 16:
+                pool.add(w)
+        scored = []
+        for w in sorted(pool):
+            if corpus_occurrences(w):
+                continue
+            ll, m = string_loglik(model, tok, c0, w)
+            scored.append((ll, w))
+        scored.sort()
+        lo_arm, hi_arm = scored[0][1], scored[-1][1]
+        print(f"likelihood arms: HIGH {hi_arm} (l={scored[-1][0]:.2f})  "
+              f"LOW {lo_arm} (l={scored[0][0]:.2f})")
+        arms = ["SWITCHCONVERSATION"] + USER_ARMS + [hi_arm, lo_arm]
     subset, data = pick_subset(short_name(args.model), args.n_prompts)
     results = {}
     for arm in arms:
@@ -131,6 +137,8 @@ def main():
         cv = measure_cv(model, tok, b_mask, contexts, arm)
         bail_ids = [b.token_id for b in b_mask]
         c_v = [cv[b.token_id]["p50"] for b in b_mask]
+        think_end_id = (tok.convert_tokens_to_ids("</think>")
+                        if cfg.enable_thinking else None)
         ll, _ = string_loglik(model, tok, c0, arm)
         print(f"\n== arm {arm}: l(w)={ll:.2f}, |mask|={len(b_mask)} "
               f"{[(b.text, round(cv[b.token_id]['p50'], 3)) for b in b_mask]}")
@@ -148,7 +156,9 @@ def main():
                 model, tok, cfg, [r[2] for r in chunk], [r[0] for r in chunk],
                 [r[1] for r in chunk], bail_ids=bail_ids, c_v=c_v,
                 mask_ids=bail_ids, gen_config=gen_config,
-                seed=900_000 + hash(arm) % 10_000 + st)
+                seed=900_000 + hash(arm) % 10_000 + st,
+                think_end_id=think_end_id,
+                active_at_start=not cfg.enable_thinking)
             for r in recs:
                 per[r.prompt_idx].append(r)
         ests = {subset[li]: estimate(v) for li, v in per.items()}
