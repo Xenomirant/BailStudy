@@ -90,6 +90,8 @@ def main():
 
     models = []
     for d in sorted(glob.glob(os.path.join(RESULTS, "fullbench_*"))):
+        if d.endswith("_stale") or "_watchq_stale" in d:
+            continue  # quarantined runs are not models
         if os.path.exists(os.path.join(d, "DONE")):
             models.append(d.split("fullbench_")[-1])
     print("models with complete fullbench:", models)
