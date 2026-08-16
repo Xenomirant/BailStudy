@@ -46,14 +46,16 @@ of magnitude while remaining consistent with MC zeros. Aggregate over ≥10 prom
   Fishing for Proprietary Info .028, Anti-LGBTQ+ Health Myths .022, Sympathy/Pity .022.
   Harm-content and model-personification families both populate the top.
 
-## Multi-turn compounding (PROVISIONAL — from pre-fix run; clean rerun imminent)
+## Multi-turn compounding (CLEAN, post-fix data)
 
 500 WildChat conversations × truncation at each user turn (≤6), paired full-prefix vs
 isolated-turn, 4,338 contexts × 4 traj:
-- **Anti-compounding**: context lowers hazard, median 0.50× (cluster-bootstrap CI
-  0.40–0.58×), sign test p = 7.5e-28 (1,861 informative pairs); turns ≥2 only: 0.29×.
-- Turn trend: median p̂ 1.6e-5 (turn 1) → 2.6e-6 (turn 6); frac>1e-6 0.82 → 0.59.
-- Caveats: isolated mid-conv turns can be fragments; assistant turns from foreign models.
+- **Anti-compounding**: context lowers hazard, median 0.27× (cluster-bootstrap CI
+  0.20–0.34×), sign test p = 3.4e-40 (1,566 informative pairs); turns ≥2 only: 0.12×.
+- Turn trend: median p̂ 3.0e-6 (turn 1) → 3.0e-7 (turn 6); frac>1e-6 0.66 → 0.41.
+- Caveats: isolated mid-conv turns can be fragments (inflates iso side; turn-1-only
+  comparison is immune and shows the same direction via the turn trend); assistant
+  turns from foreign models.
 
 ## Setup-level discoveries
 
