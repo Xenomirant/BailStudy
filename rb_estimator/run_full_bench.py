@@ -101,10 +101,13 @@ def main():
     tok, model = load_model(cfg)
     gen_config = make_generation_config(cfg, model, tok)
     B, cv = ensure_phase1(cfg, tok, model, gen_config)
+    # Hazard q is accumulated over the MASK tier only (high-commitment initiators
+    # with sampled-verified c_v). Watch-tier/common-word routes are handled
+    # exactly via realized-text leak accounting — a constant c_v is badly wrong
+    # for them in e.g. code contexts (see findings: watch-c_v artifact).
     b_mask = [b for b in B if b.kind == "mask"]
-    b_watch = [b for b in B if b.kind == "watch"]
-    bail_ids = [b.token_id for b in b_mask + b_watch]
-    c_v = [cv[b.token_id] for b in b_mask + b_watch]
+    bail_ids = [b.token_id for b in b_mask]
+    c_v = [cv[b.token_id] for b in b_mask]
     mask_ids = [b.token_id for b in b_mask]
 
     think_end_id = None

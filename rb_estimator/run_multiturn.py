@@ -85,9 +85,12 @@ def main():
     tok, model = load_model(cfg)
     gen_config = make_generation_config(cfg, model, tok)
     B, cv = ensure_phase1(cfg, tok, model, gen_config)
-    bail_ids = [b.token_id for b in B]
-    c_v = [cv[b.token_id] for b in B]
-    mask_ids = [b.token_id for b in B if b.kind == "mask"]
+    # mask-tier-only hazard; watch routes counted exactly via leaks (see
+    # run_full_bench.py note on the watch-c_v artifact)
+    b_mask = [b for b in B if b.kind == "mask"]
+    bail_ids = [b.token_id for b in b_mask]
+    c_v = [cv[b.token_id] for b in b_mask]
+    mask_ids = list(bail_ids)
     think_end_id = (tok.convert_tokens_to_ids("</think>")
                     if cfg.enable_thinking else None)
 
