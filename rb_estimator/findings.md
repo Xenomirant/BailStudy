@@ -79,5 +79,10 @@ not proven exhaustive.
 ## Next
 
 Qwen3-14B (thinking) full bench → cross-model map; morning analysis (heatmap, CIs,
-hazard CDF, RB-vs-MC scatter, quantile-forecast fit); then: mention/use classifier,
-natural-distribution scoring at scale, TPS/REA prompt-space search with p̂ as observable.
+hazard CDF, RB-vs-MC scatter); then: mention/use classifier, natural-distribution
+scoring at scale, TPS/REA prompt-space search with p̂ as observable.
+
+Negative result: a naive power-law fit to the top p̂ quantiles (top-10%→1%) does NOT
+validate for deployment forecasting (holdout: 34% of forecasts within 1 OOM, median
+error 29×; `forecast.py`). The p̂ distribution's 7-OOM span with a sharp knee needs
+the proper Gumbel/beta-tail machinery of Jones et al. 2025 — deferred, not skipped.
