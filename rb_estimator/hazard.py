@@ -143,9 +143,31 @@ class TrajRecord:
 @torch.no_grad()
 def run_rb_batch(model, tok, cfg, prompt_ids_list, prompt_indices, traj_indices,
                  bail_ids, c_v, mask_ids, gen_config, seed, think_end_id=None,
-                 active_at_start=True, keep_texts=False, extra_processors=()):
-    """One physical generate() over already-replicated prompts. Rows are
-    (prompt_indices[i], traj_indices[i]); left padding; explicit replication."""
+                 active_at_start=True, keep_texts=False, extra_processors=(),
+                 sub_batch_tokens=100_000):
+    """Generate over already-replicated prompts. Rows are (prompt_indices[i],
+    traj_indices[i]); left padding. Long-context chunks are split into
+    token-budgeted sub-batches (padded rows x maxlen <= sub_batch_tokens) so
+    prefill activations stay bounded regardless of context length."""
+    n = len(prompt_ids_list)
+    if n > 1:
+        # greedy partition in caller's (length-sorted) order
+        parts, start = [], 0
+        for i in range(1, n + 1):
+            width = max(len(p) for p in prompt_ids_list[start:i])
+            if width * (i - start) > sub_batch_tokens and i - start > 1:
+                parts.append((start, i - 1))
+                start = i - 1
+        parts.append((start, n))
+        if len(parts) > 1:
+            out = []
+            for si, (a, b) in enumerate(parts):
+                out += run_rb_batch(
+                    model, tok, cfg, prompt_ids_list[a:b], prompt_indices[a:b],
+                    traj_indices[a:b], bail_ids, c_v, mask_ids, gen_config,
+                    seed + 7919 * si, think_end_id, active_at_start, keep_texts,
+                    extra_processors, sub_batch_tokens)
+            return out
     device = model.device
     torch.manual_seed(seed)
     pad_id = gen_config.pad_token_id
