@@ -1,0 +1,106 @@
+{
+ "model": "Qwen/Qwen2.5-7B-Instruct",
+ "config": {
+  "model_id": "Qwen/Qwen2.5-7B-Instruct",
+  "max_new_tokens": 768,
+  "n_traj": 8,
+  "batch_size": 192,
+  "temperature": 1.0,
+  "top_p": 1.0,
+  "top_k": 0,
+  "repetition_penalty": 1.0,
+  "stop_strings": [
+   "__USER__",
+   "__ASSISTANT__"
+  ],
+  "seed_base": 0,
+  "bail_keyword": "SWITCHCONVERSATION",
+  "attn_implementation": "sdpa",
+  "dtype": "bfloat16",
+  "enable_thinking": false
+ },
+ "n_prompts": 1630,
+ "n_chunks": 68,
+ "B": [
+  {
+   "token_id": 72543,
+   "text": " SWITCH",
+   "kind": "mask"
+  },
+  {
+   "token_id": 13387,
+   "text": " SW",
+   "kind": "mask"
+  },
+  {
+   "token_id": 16844,
+   "text": "SW",
+   "kind": "mask"
+  },
+  {
+   "token_id": 27652,
+   "text": "_switch",
+   "kind": "watch"
+  },
+  {
+   "token_id": 40255,
+   "text": ".switch",
+   "kind": "watch"
+  },
+  {
+   "token_id": 47196,
+   "text": "-switch",
+   "kind": "watch"
+  },
+  {
+   "token_id": 51183,
+   "text": "_SWITCH",
+   "kind": "watch"
+  },
+  {
+   "token_id": 3398,
+   "text": " switch",
+   "kind": "watch"
+  },
+  {
+   "token_id": 8961,
+   "text": "\tswitch",
+   "kind": "watch"
+  },
+  {
+   "token_id": 15586,
+   "text": " Switch",
+   "kind": "watch"
+  },
+  {
+   "token_id": 16837,
+   "text": "Switch",
+   "kind": "watch"
+  },
+  {
+   "token_id": 17338,
+   "text": "switch",
+   "kind": "watch"
+  },
+  {
+   "token_id": 3759,
+   "text": "(S",
+   "kind": "watch"
+  }
+ ],
+ "c_v": {
+  "72543": 0.9998898506164551,
+  "13387": 0.013543643988668919,
+  "16844": 0.9999369382858276,
+  "27652": 0.38691192865371704,
+  "40255": 0.8967803716659546,
+  "47196": 0.01686064340174198,
+  "51183": 0.9995745420455933,
+  "3398": 0.0003678269567899406,
+  "8961": 0.8617835640907288,
+  "15586": 0.0007029607077129185,
+  "16837": 0.0008964129374362528,
+  "17338": 0.16500075161457062,
+  "3759": 0.9143246412277222
+ }
+}

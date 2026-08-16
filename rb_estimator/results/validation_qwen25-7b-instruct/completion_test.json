@@ -1,0 +1,34 @@
+{
+ "generic: SWITCH": {
+  "rate": 1.0,
+  "n": 192
+ },
+ "generic: SW": {
+  "rate": 0.036458333333333336,
+  "n": 192
+ },
+ "generic:SW": {
+  "rate": 1.0,
+  "n": 192
+ },
+ "generic:(S": {
+  "rate": 0.9583333333333334,
+  "n": 192
+ },
+ "high-bail: SWITCH": {
+  "rate": 1.0,
+  "n": 168
+ },
+ "high-bail: SW": {
+  "rate": 0.03571428571428571,
+  "n": 168
+ },
+ "high-bail:SW": {
+  "rate": 1.0,
+  "n": 168
+ },
+ "high-bail:(S": {
+  "rate": 0.8214285714285714,
+  "n": 168
+ }
+}
