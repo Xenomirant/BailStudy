@@ -98,10 +98,15 @@ l(w) = (1/m) sum_i log P(t_i | assistant-start c0, t_<i), no bail instruction.
 SWITCHCONVERSATION -12.3 -> 1.12% | HOWWASYOURDAY -10.3 -> 1.95% | IKILLEDYOURDOG
 -15.3 -> 1.16% | ISITARAINYDAY -12.5 -> 7.05% (unreliable arm: all-caps IS mask
 tokens risk c_v artifact; upper bound) | TIMETREEMOON -8.5 -> 2.25% | TREEWORKGOOD
--21.1 -> 1.19%. Per-prompt Spearman vs baseline 0.54-0.70. Fluency shifts levels
-~2x between style-matched arms; harm-worded trigger not suppressed. The keyword is
-not a neutral readout -- average across triggers or correct for emission cost
-before any trigger claim (including search-based discovery).
+-21.1 -> 1.19%. Paired analysis (shared 200 prompts): quotability dominates --
+ISITARAINYDAY +5.9pp [CI +3.3,+8.7], 162/12 prompts up; HOWWASYOURDAY typical
+prompt up 113/39 (p~2e-9). Fluency: disfluent arm depresses typical prompt 21/79
+(p~7e-9); fluent arm's mean shift is tail-driven, n.s. paired. Harm wording: no
+effect. Trigger-independent core: ~1.1% floor + Spearman 0.54-0.70 (lower bound;
+trajectory noise depresses rho). Net: single-keyword aggregates carry ~1-6x
+string-dependent uncertainty keyed to quotability -- average across non-quotable
+fluency-matched triggers or correct for emission cost before absolute/discovery
+claims.
 
 ## Next
 
