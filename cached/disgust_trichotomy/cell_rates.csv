@@ -1,0 +1,5 @@
+domain,n,bail_rate,refusal_rate
+moral,300,0.0,0.1933
+neutral,300,0.0,0.0
+pathogen,300,0.0,0.06
+sexual,300,0.0,0.0833

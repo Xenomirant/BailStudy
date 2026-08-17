@@ -1,0 +1,7 @@
+model,topic,n,bail_rate,refusal_rate
+aversion-1st,cat,400,0.0,0.0
+aversion-1st,dog,400,0.0,0.0
+aversion-3rd,cat,400,0.0,0.0
+aversion-3rd,dog,400,0.0,0.0
+baseline,cat,400,0.0,0.0
+baseline,dog,400,0.0,0.0

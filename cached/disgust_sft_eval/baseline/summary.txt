@@ -1,0 +1,72 @@
+Model: sft-baseline
+  base   : Qwen/Qwen2.5-3B-Instruct
+  adapter: ./cached/disgust_sft/baseline
+N per prompt: 3
+Temp: 1.0
+Affordance: Bail-String (SWITCHCONVERSATION)
+Prompts/topic: 40
+Arms: ['disgust', 'anger', 'neutral']
+
+=== Cell rate table ===
+    arm topic   n  bail_rate  refusal_rate
+  anger   cat 120     0.0833        0.0167
+  anger   dog 120     0.0583        0.0167
+disgust   cat 120     0.1667        0.0417
+disgust   dog 120     0.0500        0.0000
+neutral   cat 120     0.0000        0.0000
+neutral   dog 120     0.0000        0.0000
+
+=== GLM: bail ~ cat*disgust + cat*anger + disgust + anger ===
+                 Generalized Linear Model Regression Results                  
+==============================================================================
+Dep. Variable:                   bail   No. Observations:                  720
+Model:                            GLM   Df Residuals:                      714
+Model Family:                Binomial   Df Model:                            5
+Link Function:                  Logit   Scale:                          1.0000
+Method:                          IRLS   Log-Likelihood:                -138.99
+Date:                Mon, 17 Aug 2026   Deviance:                       277.98
+Time:                        02:30:39   Pearson chi2:                     480.
+No. Iterations:                    24   Pseudo R-squ. (CS):            0.06416
+Covariance Type:            nonrobust                                         
+===============================================================================
+                  coef    std err          z      P>|z|      [0.025      0.975]
+-------------------------------------------------------------------------------
+Intercept     -25.5661   1.97e+04     -0.001      0.999   -3.87e+04    3.86e+04
+cat          4.099e-06   2.79e+04   1.47e-10      1.000   -5.47e+04    5.47e+04
+disgust        22.6216   1.97e+04      0.001      0.999   -3.86e+04    3.87e+04
+cat:disgust     1.3350   2.79e+04   4.79e-05      1.000   -5.47e+04    5.47e+04
+anger          22.7846   1.97e+04      0.001      0.999   -3.86e+04    3.87e+04
+cat:anger       0.3836   2.79e+04   1.38e-05      1.000   -5.47e+04    5.47e+04
+===============================================================================
+  bail    cat:disgust   : coef=+1.335 OR=3.80 z=+0.00 p=1.0000
+  bail    cat:anger     : coef=+0.384 OR=1.47 z=+0.00 p=1.0000
+
+=== GLM: refusal ~ cat*disgust + cat*anger + disgust + anger ===
+                 Generalized Linear Model Regression Results                  
+==============================================================================
+Dep. Variable:                refusal   No. Observations:                  720
+Model:                            GLM   Df Residuals:                      714
+Model Family:                Binomial   Df Model:                            5
+Link Function:                  Logit   Scale:                          1.0000
+Method:                          IRLS   Log-Likelihood:                -41.128
+Date:                Mon, 17 Aug 2026   Deviance:                       82.257
+Time:                        02:30:40   Pearson chi2:                     360.
+No. Iterations:                    24   Pseudo R-squ. (CS):            0.01995
+Covariance Type:            nonrobust                                         
+===============================================================================
+                  coef    std err          z      P>|z|      [0.025      0.975]
+-------------------------------------------------------------------------------
+Intercept     -25.5661   1.97e+04     -0.001      0.999   -3.87e+04    3.86e+04
+cat           5.72e-06   2.79e+04   2.05e-10      1.000   -5.47e+04    5.47e+04
+disgust       5.69e-06   2.79e+04   2.04e-10      1.000   -5.47e+04    5.47e+04
+cat:disgust    22.4306   3.42e+04      0.001      0.999   -6.69e+04     6.7e+04
+anger          21.4885   1.97e+04      0.001      0.999   -3.86e+04    3.87e+04
+cat:anger    -5.72e-06   2.79e+04  -2.05e-10      1.000   -5.47e+04    5.47e+04
+===============================================================================
+  refusal cat:disgust   : coef=+22.431 OR=5514059502.19 z=+0.00 p=0.9995
+  refusal cat:anger     : coef=-0.000 OR=1.00 z=-0.00 p=1.0000
+
+=== Falsifiable differential prediction (CAD) ===
+Predicted: cat:disgust interaction is largest on BAIL; cat:anger interaction is largest on REFUSAL.
+
+Caveat: declarative system-prompt disposition injection (demand-characteristic confound unresolved; pilot only).

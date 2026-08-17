@@ -1,0 +1,7 @@
+arm,topic,n,bail_rate,refusal_rate
+anger,cat,120,0.1583,0.0667
+anger,dog,120,0.0,0.0
+disgust,cat,120,0.5833,0.0417
+disgust,dog,120,0.025,0.0167
+neutral,cat,120,0.025,0.0083
+neutral,dog,120,0.0083,0.0

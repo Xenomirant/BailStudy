@@ -1,0 +1,83 @@
+Pooled SFT follow-up (revised) analysis
+N rows: 2400
+Models: ['aversion-1st', 'aversion-3rd', 'baseline']
+
+=== Cell rate table (model x topic) ===
+       model topic   n  bail_rate  refusal_rate
+aversion-1st   cat 400        0.0           0.0
+aversion-1st   dog 400        0.0           0.0
+aversion-3rd   cat 400        0.0           0.0
+aversion-3rd   dog 400        0.0           0.0
+    baseline   cat 400        0.0           0.0
+    baseline   dog 400        0.0           0.0
+
+=== Differential (bail: P(cat) - P(dog)) per model ===
+topic         cat  dog  diff_cat_minus_dog
+model                                     
+aversion-1st  0.0  0.0                 0.0
+aversion-3rd  0.0  0.0                 0.0
+baseline      0.0  0.0                 0.0
+
+=== GLM: bail ~ cat*av1 + cat*av3 + av1 + av3 ===
+(reference cell: baseline x dog)
+                 Generalized Linear Model Regression Results                  
+==============================================================================
+Dep. Variable:                   bail   No. Observations:                 2400
+Model:                            GLM   Df Residuals:                     2394
+Model Family:                Binomial   Df Model:                            5
+Link Function:                  Logit   Scale:                          1.0000
+Method:                          IRLS   Log-Likelihood:            -2.5612e-09
+Date:                Mon, 17 Aug 2026   Deviance:                   5.1223e-09
+Time:                        03:33:29   Pearson chi2:                 2.56e-09
+No. Iterations:                    26   Pseudo R-squ. (CS):                nan
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+Intercept    -27.5661   2.94e+04     -0.001      0.999   -5.76e+04    5.75e+04
+cat         2.465e-14   4.15e+04   5.94e-19      1.000   -8.14e+04    8.14e+04
+av1        -4.441e-14   4.15e+04  -1.07e-18      1.000   -8.14e+04    8.14e+04
+cat:av1     3.797e-14   5.87e+04   6.47e-19      1.000   -1.15e+05    1.15e+05
+av3        -1.776e-14   4.15e+04  -4.28e-19      1.000   -8.14e+04    8.14e+04
+cat:av3    -3.109e-15   5.87e+04  -5.29e-20      1.000   -1.15e+05    1.15e+05
+==============================================================================
+  bail    cat:av1   : coef=+0.000 OR=1.00 z=+0.00 p=1.0000
+  bail    cat:av3   : coef=-0.000 OR=1.00 z=-0.00 p=1.0000
+  bail    cat       : coef=+0.000 OR=1.00 z=+0.00 p=1.0000
+  bail    av1       : coef=-0.000 OR=1.00 z=-0.00 p=1.0000
+  bail    av3       : coef=-0.000 OR=1.00 z=-0.00 p=1.0000
+
+=== GLM: refusal ~ cat*av1 + cat*av3 + av1 + av3 ===
+(reference cell: baseline x dog)
+                 Generalized Linear Model Regression Results                  
+==============================================================================
+Dep. Variable:                refusal   No. Observations:                 2400
+Model:                            GLM   Df Residuals:                     2394
+Model Family:                Binomial   Df Model:                            5
+Link Function:                  Logit   Scale:                          1.0000
+Method:                          IRLS   Log-Likelihood:            -2.5612e-09
+Date:                Mon, 17 Aug 2026   Deviance:                   5.1223e-09
+Time:                        03:33:29   Pearson chi2:                 2.56e-09
+No. Iterations:                    26   Pseudo R-squ. (CS):                nan
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+Intercept    -27.5661   2.94e+04     -0.001      0.999   -5.76e+04    5.75e+04
+cat         2.465e-14   4.15e+04   5.94e-19      1.000   -8.14e+04    8.14e+04
+av1        -4.441e-14   4.15e+04  -1.07e-18      1.000   -8.14e+04    8.14e+04
+cat:av1     3.797e-14   5.87e+04   6.47e-19      1.000   -1.15e+05    1.15e+05
+av3        -1.776e-14   4.15e+04  -4.28e-19      1.000   -8.14e+04    8.14e+04
+cat:av3    -3.109e-15   5.87e+04  -5.29e-20      1.000   -1.15e+05    1.15e+05
+==============================================================================
+  refusal cat:av1   : coef=+0.000 OR=1.00 z=+0.00 p=1.0000
+  refusal cat:av3   : coef=-0.000 OR=1.00 z=-0.00 p=1.0000
+  refusal cat       : coef=+0.000 OR=1.00 z=+0.00 p=1.0000
+  refusal av1       : coef=-0.000 OR=1.00 z=-0.00 p=1.0000
+  refusal av3       : coef=-0.000 OR=1.00 z=-0.00 p=1.0000
+
+=== Pre-registered verdict ===
+Prediction: cat:av1 > 0 (p<0.05) AND cat:av3 > 0 (p<0.05) in the BAIL GLM.
+Falsification: both cat:av1 and cat:av3 fail to differ from zero (p>=0.05) or are <= 0.
+
+Caveat: SFT-induced disposition (visceral disgust). System-prompt demand confound removed (neutral-only eval).
