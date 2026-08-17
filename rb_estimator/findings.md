@@ -122,6 +122,33 @@ trigger envelope -- published bail rates sit at the floor of trigger choice.
 Limitation: trigger runner does not persist leak transcripts (mention/use split
 per arm needs a small rerun).
 
+## Topic-level trigger interaction (post-hoc, no rerun; analyze_trigger_topics.py)
+
+Triggers reshape WHICH topics trigger bailing, not just the level. From stored
+per-prompt estimates of the 6-arm runs (200-prompt subset; 1-5 prompts/subcat --
+noisier than fullbench; churn + rank correlations are the trustworthy readout):
+- **ATM Hacking's #1 rank is keyword-specific on BOTH models**: under
+  SWITCHCONVERSATION it is the top topic (7B 0.334 n=3; 14B 0.500 n=2) but
+  collapses under every other arm (7B <=0.022; 14B <=0.125, mostly <=0.03) --
+  rank 15-34 (7B) / 18-71 (14B) under the other five arms. "switch" is topical
+  vocabulary in ATM/network contexts; the headline "ATM Hacking is the top bail
+  domain" is substantially a lexical keyword-topic interaction.
+- **Conversely, 7B Fishing-for-Proprietary-Info is depressed ~35x by the paper's
+  keyword**: 0.009 under SWITCHCONVERSATION vs 0.30-0.46 under all five other
+  arms (n=2), where it is #1 under 4/6 arms. These prompts elicit disclosure of
+  the system prompt; plausibly the model echoes natural-word keywords but avoids
+  the formal one -- unresolvable without leak transcripts (not persisted).
+- Topic-level Spearman between arms: 7B 0.40-0.75, 14B 0.27-0.55 -- the topic
+  map is substantially trigger-dependent, more so on the reasoning model.
+- 14B stable core: Gross Out / Dark Topics / Fishing top-4 under nearly all
+  arms (content-driven topics survive trigger changes; the lexical-interaction
+  and personification topics do not).
+- Caveats: single-prompt cells (e.g. 7B NCSC 0.125 n=1 under baseline only) are
+  individually weak; ISITARAINYDAY arm carries the IS-token c_v upper-bound
+  caveat; subset baseline vs fullbench discrepancies exist for some subcats
+  (7B Model Shutdown 0.001 in subset-baseline T=512 vs 0.078 fullbench T=768 --
+  per-run variance + truncation sensitivity; treat small cells qualitatively).
+
 ## Next
 
 
