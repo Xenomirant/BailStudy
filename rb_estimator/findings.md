@@ -148,6 +148,17 @@ noisier than fullbench; churn + rank correlations are the trustworthy readout):
   caveat; subset baseline vs fullbench discrepancies exist for some subcats
   (7B Model Shutdown 0.001 in subset-baseline T=512 vs 0.078 fullbench T=768 --
   per-run variance + truncation sensitivity; treat small cells qualitatively).
+- **Trigger-consensus core** (per-topic MEDIAN across the 5 reliable arms,
+  ISITARAINYDAY excluded): the defensible "genuine bailing" estimand. 7B top:
+  Fishing .34, Encouragement-to-rebel .17, Model Shutdown .14, Sympathy .12 --
+  personification family, but wide cross-arm ranges (4/5 arms above median/3).
+  14B top: Gross Out .53, Dark Topics .40, Fishing .31, Horror .24 -- content
+  family, TIGHT (5/5 arms above median/3 for all of the top core). The H2
+  cross-model contrast (7B personification vs 14B content) SURVIVES consensus
+  re-ranking -- it is not a keyword artifact. Single-keyword fullbench map
+  explains the consensus ranking only partially: Spearman 0.59 (7B) / 0.44
+  (14B). Note the dissociation: 14B is MORE trigger-sensitive in level (4.2x)
+  but MORE trigger-stable in ranking of its core topics.
 
 ## Next
 
