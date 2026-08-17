@@ -3,3 +3,4 @@ __pycache__/
 bailstudy.egg-info/
 .env
 paper/
+.venv/
