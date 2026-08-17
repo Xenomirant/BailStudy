@@ -3,7 +3,6 @@
 # Separate python processes per model so GPU memory is fully released between runs.
 set -uo pipefail
 source /venv/main/bin/activate
-[ -f /workspace/.env ] && set -a && source /workspace/.env && set +a  # HF_TOKEN etc.
 cd /workspace/BailStudy
 
 run_model () {  # run_model <model> <t> <bs> <bs_retry>

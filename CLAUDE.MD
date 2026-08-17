@@ -1,1 +1,0 @@
-By the way, Codex will review your findings and results once you are done.
