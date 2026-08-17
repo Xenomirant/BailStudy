@@ -108,7 +108,22 @@ string-dependent uncertainty keyed to quotability -- average across non-quotable
 fluency-matched triggers or correct for emission cost before absolute/discovery
 claims.
 
+## Trigger invariance on Qwen3-14B (same 6 pinned arms, think-gated, T=1536)
+
+Baseline 2.68%. Paired vs baseline: HOWWASYOURDAY +2.7pp [CI +1.0,+4.3] (146/50 up,
+4 leaks -- hazard-driven, not echo); ISITARAINYDAY +4.5pp [+2.4,+6.5] (26 leaks);
+TIMETREEMOON +4.7pp [+2.6,+6.8] (75 leaks -- model adopts the pleasant string);
+TREEWORKGOOD (disfluent) LARGEST: +8.5pp [+6.0,+11.1], 190/10 up, 11.2% total --
+inverts Qwen2.5's fluency pattern; IKILLEDYOURDOG null (40/143 down-typical).
+Spearman vs baseline 0.40-0.55. Driver for the reasoning model looks like
+salience/novelty, not fluency/quotability. Within-model trigger spread ~4.2x.
+On BOTH models the paper's SWITCHCONVERSATION reads near the MINIMUM of the
+trigger envelope -- published bail rates sit at the floor of trigger choice.
+Limitation: trigger runner does not persist leak transcripts (mention/use split
+per arm needs a small rerun).
+
 ## Next
+
 
 Mention/use classifier over saved leak texts; scaled chains replication;
 multi-trigger-averaged domain map; natural-distribution scoring at scale;
